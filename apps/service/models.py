@@ -50,7 +50,7 @@ class Service(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner', blank=True, null=True)
     type = models.IntegerField(choices=SubscribeType.choices, default=SubscribeType.DEFAULT)
     is_premium = models.BooleanField(default=False)
-    sort_number = models.IntegerField()
+    sort_number = models.IntegerField(default=0)
     view_count = models.IntegerField(default=0)
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
 

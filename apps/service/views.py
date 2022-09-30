@@ -4,7 +4,7 @@ from rest_framework.response import Response
 import rest_framework.request
 
 from .models import Service, Comment
-from .serializers import ServiceSerializer, CommentSerializer
+from .serializers import ServiceSerializer, CommentSerializer, ServiceImageSerializer
 
 
 class ServiceView(APIView):
@@ -18,10 +18,14 @@ class ServiceView(APIView):
 
 class ServiceCreateView(APIView):
     def post(self, request: rest_framework.request.Request, *args, **kwargs):
+        for i in request.data['image']:
+            image_serializer = ServiceImageSerializer(data=i)
+            if image_serializer.is_valid():
+                image_serializer.save()
         serializer = ServiceSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponse("Added!")
+            return HttpResponse(serializer.data)
         return HttpResponse("Not added!")
 
 
@@ -49,7 +53,7 @@ class CommentCreateView(APIView):
         comment_serializer = CommentSerializer(data=request.data)
         if comment_serializer.is_valid():
             comment_serializer.save()
-            return Response("Added!")
+            return Response(comment_serializer.data)
         return Response("Not added!")
 
 
