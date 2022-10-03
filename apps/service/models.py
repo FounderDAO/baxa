@@ -81,6 +81,7 @@ class WorkingDay(models.Model):
 
 
 class Comment(models.Model):
+    service = models.ForeignKey(Service, on_delete=models.CASCADE)
     parent = models.ForeignKey('Comment', on_delete=models.CASCADE, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
@@ -89,3 +90,9 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.description
+
+
+class CommentImage(models.Model):
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
+    file = models.FileField()
+    status = models.IntegerField(choices=Status.choices, default=Status.NEW)

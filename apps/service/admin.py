@@ -17,6 +17,7 @@ class ServiceImgAdmin(admin.ModelAdmin):
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ["parent", "user", "description", "rank"]
+    list_display_links = ['user']
 
 
 admin.site.register(Service, ServiceAdmin)

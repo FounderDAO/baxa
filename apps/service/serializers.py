@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Service, Comment, ServiceImage
+from .models import Service, Comment, ServiceImage, CommentImage
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -17,4 +17,10 @@ class ServiceImageSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
+        fields = '__all__'
+
+
+class CommentImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CommentImage
         fields = '__all__'
