@@ -1,15 +1,16 @@
-from django.http import HttpResponse
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 import rest_framework.request
 
+from apps.core.models import Status
 from .models import Service, Comment
 from .serializers import ServiceSerializer, CommentSerializer, ServiceImageSerializer
 
 
 class ServiceView(APIView):
     def get(self, request: rest_framework.request.Request):
-        service = Service.objects.all()
+        service = Service.objects.filter(status=Status.ACTIVE)
         if service:
             serializers = ServiceSerializer(service, many=True)
             return Response(serializers.data)
@@ -18,15 +19,19 @@ class ServiceView(APIView):
 
 class ServiceCreateView(APIView):
     def post(self, request: rest_framework.request.Request, *args, **kwargs):
-        for i in request.data['image']:
-            image_serializer = ServiceImageSerializer(data=i)
-            if image_serializer.is_valid():
-                image_serializer.save()
+        data = request.data
         serializer = ServiceSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return HttpResponse(serializer.data)
-        return HttpResponse("Not added!")
+            for i in range(int(data['file-number'])):
+                new_service_id = serializer.data["id"]
+                image_serializer = ServiceImageSerializer(
+                    data={'service': new_service_id, "file": data['file-' + str(i)]})
+                if image_serializer.is_valid():
+                    image_serializer.save()
+            return Response(serializer.data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ServiceDeleteView(APIView):
@@ -68,7 +73,7 @@ class CommentDeleteView(APIView):
 
 
 class CommentEditView(APIView):
-    def post(self, request: rest_framework.request.Request, id:int):
+    def post(self, request: rest_framework.request.Request, id: int):
         comment = Comment.objects.filter(id=id)
         if comment:
             if comment[0].user.id:

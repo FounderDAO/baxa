@@ -45,7 +45,7 @@ class Service(models.Model):
     address = models.CharField(max_length=220)
     service_phone_number = models.CharField(max_length=30)  # for us
     logo = models.FileField(upload_to="service_logos", blank=True, null=True)
-    rank = models.FloatField()
+    rank = models.FloatField(default=0.0)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner', blank=True, null=True)
     type = models.IntegerField(choices=SubscribeType.choices, default=SubscribeType.DEFAULT)
@@ -64,10 +64,9 @@ class Service(models.Model):
 
 class ServiceImage(models.Model):
     service = models.ForeignKey(Service, on_delete=models.CASCADE, blank=True, null=True)
-    name = models.CharField(max_length=220)
     file = models.ImageField(upload_to='service_image')
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
-    sort_number = models.IntegerField()
+    sort_number = models.IntegerField(default=0)
 
     def __str__(self):
         return self.file.url
@@ -82,11 +81,11 @@ class WorkingDay(models.Model):
 
 
 class Comment(models.Model):
+    parent = models.ForeignKey('Comment', on_delete=models.CASCADE, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    title = models.CharField(max_length=220)
     description = models.TextField()
-    rank = models.FloatField()
+    rank = models.FloatField(default=0)
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
 
     def __str__(self):
-        return self.title
+        return self.description
