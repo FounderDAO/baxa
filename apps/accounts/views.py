@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.accounts.models import Country, District, Region
-from apps.accounts.serializers import CountrySerializer, DistrictSerializer, RegionSerializer, ProfileSerializer
+from apps.accounts.serializers import CountrySerializer, DistrictSerializer, RegionSerializer, ProfileSerializer, \
+    AccountSerializer
 
 
 # Create your views here.
@@ -92,3 +93,9 @@ class ProfileCreateView(APIView):
 class ProfileEditView(APIView):
     def post(self, request: rest_framework.request.Request):
         pass
+
+
+class AccountDetail(APIView):
+    def get(self, request: rest_framework.request.Request):
+        serializer = AccountSerializer(request.user, many=False)
+        return Response(serializer.data)

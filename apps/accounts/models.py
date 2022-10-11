@@ -1,6 +1,7 @@
 from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from rest_framework import serializers
 
 from apps.core.models import Language, Gender, Status, MemberType
 
@@ -8,7 +9,7 @@ from apps.core.models import Language, Gender, Status, MemberType
 class Country(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=100)
-    sort_number = models.IntegerField()
+    sort_number = models.IntegerField(default=0)
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
 
     def __str__(self):
@@ -19,7 +20,7 @@ class Region(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=100)
-    sort_number = models.IntegerField()
+    sort_number = models.IntegerField(default=0)
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
 
     def __str__(self):
@@ -31,7 +32,7 @@ class District(models.Model):
     region = models.ForeignKey(Region, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=100)
-    sort_number = models.IntegerField()
+    sort_number = models.IntegerField(default=0)
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
 
     def __str__(self):
@@ -48,6 +49,9 @@ class UserManager(BaseUserManager):
         user.set_password(password)
         user.email = email
         user.save()
+        user_serializer = ProfileSerializer(data={'user': user.id})
+        if user_serializer.is_valid():
+            user_serializer.save()
         return user
 
     def create_staffuser(self, username, email, password):
@@ -93,20 +97,26 @@ class User(AbstractUser):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    region = models.ForeignKey(Region, on_delete=models.CASCADE)
-    district = models.ForeignKey(District, on_delete=models.CASCADE)
-    phone_number = models.CharField(max_length=25)
-    home_number = models.CharField(max_length=25)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    midd_name = models.CharField(max_length=100)
-    brith_date = models.DateField()
-    gender = models.IntegerField(choices=Gender.choices)
-    type = models.IntegerField(choices=MemberType.choices)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, blank=True, null=True)
+    district = models.ForeignKey(District, on_delete=models.CASCADE, blank=True, null=True)
+    phone_number = models.CharField(max_length=25, blank=True, null=True)
+    home_number = models.CharField(max_length=25, blank=True, null=True)
+    first_name = models.CharField(max_length=100, blank=True, null=True)
+    last_name = models.CharField(max_length=100, blank=True, null=True)
+    midd_name = models.CharField(max_length=100, blank=True, null=True)
+    brith_date = models.DateField(blank=True, null=True)
+    gender = models.IntegerField(choices=Gender.choices, blank=True, null=True)
+    type = models.IntegerField(choices=MemberType.choices, default=MemberType.GUEST)
 
 
 class Image(models.Model):
     name = models.CharField(max_length=220)
     file = models.CharField(max_length=220)
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = '__all__'

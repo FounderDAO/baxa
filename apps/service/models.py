@@ -1,14 +1,18 @@
 from django.db import models
 
-from apps.accounts.models import User
+from apps.accounts.models import User, Country, Region, District
 from apps.core.models import Status
 
 
 class Category(models.Model):
+    parent = models.ForeignKey('Category', on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=30)
     description = models.TextField()
-    sort_number = models.IntegerField()
+    sort_number = models.IntegerField(default=0)
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
+
+    def __str__(self):
+        return self.name
 
 
 class Type(models.Model):
@@ -46,6 +50,9 @@ class Service(models.Model):
     service_phone_number = models.CharField(max_length=30)  # for us
     logo = models.FileField(upload_to="service_logos", blank=True, null=True)
     rank = models.FloatField(default=0.0)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    district = models.ForeignKey(District, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='author')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owner', blank=True, null=True)
     type = models.IntegerField(choices=SubscribeType.choices, default=SubscribeType.DEFAULT)
@@ -86,7 +93,7 @@ class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     description = models.TextField()
     rank = models.FloatField(default=0)
-    status = models.IntegerField(choices=Status.choices, default=Status.NEW)
+    status = models.IntegerField(choices=Status.choices, default=Status.ACTIVE)
 
     def __str__(self):
         return self.description

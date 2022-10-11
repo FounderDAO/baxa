@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.accounts.models import Region, District, Country, Profile
+from apps.accounts.models import Region, District, Country, User
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -21,7 +21,7 @@ class DistrictSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class AccountSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
+        model = User
         fields = '__all__'

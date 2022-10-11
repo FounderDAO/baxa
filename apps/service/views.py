@@ -4,8 +4,9 @@ from rest_framework.response import Response
 import rest_framework.request
 
 from apps.core.models import Status
-from .models import Service, Comment, ServiceImage, CommentImage
-from .serializers import ServiceSerializer, CommentSerializer, ServiceImageSerializer, CommentImageSerializer
+from .models import Service, Comment, ServiceImage, CommentImage, Category
+from .serializers import ServiceSerializer, CommentSerializer, ServiceImageSerializer, CommentImageSerializer, \
+    CategorySerializer
 
 
 class ServiceView(APIView):
@@ -109,3 +110,27 @@ def service_view():
             append["comment"] = comment_arr
             data.append(append)
         return Response(data)
+
+
+class CategoryCreateView(APIView):
+    def post(self, request: rest_framework.request.Request):
+        serializer = CategorySerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response("Not added!")
+
+    def get(self, request: rest_framework.request.Request, id):
+        category = Category.objects.filter(id=id)
+        if category:
+            category[0].delete()
+        return Response("deleted!")
+
+
+class CategoryEdit(APIView):
+    def post(self, request: rest_framework.request.Request, id):
+        category = Category.objects.filter(id=id)
+        if category:
+            category[0].parent = request.data['parent']
+            category[0].name = request.data['name']
+            category[0].description = request.data['description']
