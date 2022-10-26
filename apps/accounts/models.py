@@ -2,7 +2,6 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from rest_framework import serializers
-
 from apps.core.models import Language, Gender, Status, MemberType
 
 
@@ -114,7 +113,6 @@ class Image(models.Model):
     name = models.CharField(max_length=220)
     file = models.CharField(max_length=220)
     status = models.IntegerField(choices=Status.choices, default=Status.NEW)
-
 
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
